@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+:root {
+            --bg-color: #121212;
+            --text-color: white;
+            --card-bg-color: #1f1f1f;
+            --button-bg-color: #1E88E5;
+            --dropdown-bg-color: #333333;
+            --dropdown-hover-color: #555555;
+        }
+
+        body.light-mode {
+            --bg-color: #f0f0f0;
+            --text-color: #121212;
+            --card-bg-color: #ffffff;
+            --button-bg-color: #007ACC;
+            --dropdown-bg-color: #e0e0e0;
+            --dropdown-hover-color: #c0c0c0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            height: 100vh;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            background-color: var(--card-bg-color);
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .home-button {
+            background-color: var(--button-bg-color);
+            color: white;
+            font-size: 1.5rem;
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .theme-toggle-icon {
+            font-size: 1.2rem;
+            background-color: var(--button-bg-color);
+            border-radius: 50%;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .section {
+            display: none;
+            background-color: var(--card-bg-color);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .active {
+            display: block;
+        }
+
+        #analog-clock {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 5px solid black;
+            border-radius: 50%;
+            margin: auto;
+            background: #fff;
+        }
+
+        .clock-number {
+            position: absolute;
+            font-size: 1rem;
+            font-weight: bold;
+            transform: translate(-50%, -50%);
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            background-color: black;
+        }
+
+        .hour {
+            width: 4px;
+            height: 50px;
+            transform-origin: 50% 90%;
+        }
+
+        .minute {
+            width: 3px;
+            height: 70px;
+            transform-origin: 50% 90%;
+        }
+
+        .second {
+            width: 2px;
+            height: 80px;
+            background-color: red;
+            transform-origin: 50% 90%;
+        }
+
+        
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--dropdown-bg-color);
+    width: 150px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 101;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.dropdown-menu button:hover {
+    background-color: var(--dropdown-hover-color);
+}
+
+.dropdown-menu button i {
+    margin-right: 8px;
+}
+
+.theme-toggle-icon {
+    font-size: 1.2rem;
+    background-color: var(--button-bg-color);
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.section {
+    display: none;
+    background-color: var(--card-bg-color);
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    margin-top: 80px;
+    text-align: center;
+}
+
+.active {
+    display: block;
+}
+
+#digital-time {
+    font-size: 2rem;
+    margin: 10px 0;
+}
+
+#analog-clock {
+    width: 200px;
+    height: 200px;
+    border: 5px solid var(--text-color);
+    border-radius: 50%;
+    position: relative;
+    margin: 20px auto;
+    background: transparent;
+}
+
+.hand {
+    position: absolute;
+    background: var(--text-color);
+    transform-origin: bottom;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.hour {
+    width: 6px;
+    height: 50px;
+    background: var(--text-color);
+    z-index: 3;
+}
+
+.minute {
+    width: 4px;
+    height: 70px;
+    background: var(--text-color);
+    z-index: 2;
+}
+
+.second {
+    width: 2px;
+    height: 90px;
+    background: red;
+    z-index: 1;
+}
+
+button {
+    background-color: var(--button-bg-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    background-color: var(--card-bg-color);
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.bottom-nav button {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bottom-nav button i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+/*-----------------------------------------------------*/
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar-header h3 {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-date {
+            padding: 10px;
+            text-align: center;
+            background-color: var(--card-bg-color);
+            border-radius: 5px;
+            color: var(--text-color);
+        }
+
+        .calendar-date.highlighted {
+            background-color: var(--button-bg-color);
+            color: white;
+        }
+
+/*-----------------------------------------------------*/ 
+        #timer-display, #stopwatch-display {
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+
+        #digital-time {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+
+        #timer-section div {
+            margin-bottom: 10px;
+        }
+
+        #start-timer, #stop-timer, #start-stopwatch, #reset-stopwatch {
+            background-color: var(--button-bg-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+
+        #start-timer, #stop-timer {
+            display: inline-block;
+        }
+/*-----------------------------------------------------*/
+  .alarm-section {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+            text-align: center;
+        }
+        .alarm-inputs label, .alarm-inputs input {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            text-align: left;
+        }
+        .alarm-controls {
+            margin-top: 10px;
+        }
+        .alarmsList {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .modal-content {
+            display: none;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 300px;
+            text-align: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .alarm-message {
+            color: #38a169;
+            margin-top: 15px;
+            display: none;
+        }
+        .error-message {
+            color: #e53e3e;
+            margin-top: 15px;
+            display: none;
+        }
+
+</style>
+<body class="light-mode">
+
+<div class="header">
+    <div class="home-button" onclick="toggleDropdown()">
+        🏠 Home
+        <div class="dropdown-menu" id="dropdown-menu">
+            <button onclick="showSection('clock')"><i>🕒</i> Clock</button>
+            <button onclick="showSection('timer')"><i>⏳</i> Timer</button>
+            <button onclick="showSection('stopwatch')"><i>⏱</i> Stopwatch</button>
+            <button onclick="showSection('calendar')"><i>📅</i> Calendar</button>
+            <button onclick="showSection('alarm')"><i>⏰</i> Alarm</button>
+        </div>
+    </div>
+    <h1>Clock App</h1>
+    <button class="theme-toggle-icon" id="toggle-theme">🌙</button>
+</div>
+
+<div class="section active" id="clock-section">
+    <h2>Clock</h2>
+    <div id="analog-clock">
+        <div class="hand hour" id="hour-hand"></div>
+        <div class="hand minute" id="minute-hand"></div>
+        <div class="hand second" id="second-hand"></div>
+    </div>
+    <h3 id="digital-time">01:19:55 AM</h3>
+    <h3 id="current-date">10/26/2024</h3>
+    <p id="current-day">Saturday</p>
+</div>
+
+<div class="section" id="timer-section">
+    <h2>Timer</h2>
+    <div>
+        <label for="timer-hours">Hours:</label>
+        <input type="number" id="timer-hours" min="0" value="0"><br>
+    </div>
+    <div>
+        <label for="timer-minutes">Minutes:</label>
+        <input type="number" id="timer-minutes" min="0" value="0"><br>
+    </div>
+    <div>
+        <label for="timer-seconds">Seconds:</label>
+        <input type="number" id="timer-seconds" min="0" value="0"><br>
+    </div>
+    <button id="start-timer">Start Timer</button>
+    <button id="stop-timer">Reset Timer</button>
+    <h3 id="timer-display">00:00:00.000</h3>
+</div>
+
+<div class="section" id="stopwatch-section">
+    <h2>Stopwatch</h2>
+    <button id="start-stopwatch">Start</button>
+    <button id="reset-stopwatch">Reset</button>
+    <h3 id="stopwatch-display">00:00:00.00</h3>
+</div>
+
+<div class="section" id="calendar-section">
+    <h2>Calendar</h2>
+    <div class="calendar-header">
+        <button onclick="prevMonth()">◀</button>
+        <h3 id="calendar-month-year"></h3>
+        <button onclick="nextMonth()">▶</button>
+    </div>
+    <div class="calendar-days">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+    </div>
+    <div class="calendar-grid" id="calendar-dates"></div>
+</div>
+
+<div class="section" id="alarm-section">
+            <h2>Alarm</h2>
+            <div class="alarm-inputs">
+                <label for="alarmDate">Set Alarm Date:</label>
+                <input type="date" id="alarmDate" required>
+                <label for="alarmTime">Set Alarm Time:</label>
+                <input type="time" id="alarmTime" required>
+            </div>
+            <div class="alarm-controls">
+                <button id="setAlarmBtn" class="button">Set Alarm</button>
+                <div id="alarmMessage" class="alarm-message hidden">Alarm set successfully!</div>
+                <div id="errorMessage" class="error-message hidden">Please select a future date and time.</div>
+            </div>
+            <div id="alarmsList" class="alarmsList"></div>
+        </div>
+    
+        <div id="modal" class="modal-content">
+            <h2>Alarm!⏰</h2>
+            <h1>Time Up (Wake up)</h1>
+            <button id="stopAlarmBtn" class="button">Stop Alarm</button>
+        </div>
+        <audio id="alarmSound" src="https://media.geeksforgeeks.org/wp-content/uploads/20240228225306/twirling-intime-lenovo-k8-note-alarm-tone-41440.mp3" preload="auto"></audio>
+    
+    </div>
+
+<div class="bottom-nav">
+    <button onclick="showSection('clock')">
+        <i>🕒</i> Clock
+    </button>
+    <button onclick="showSection('timer')">
+        <i>⏳</i> Timer
+    </button>
+    <button onclick="showSection('stopwatch')">
+        <i>⏱</i> Stopwatch
+    </button>
+    <button onclick="showSection('calendar')">
+        <i>📅</i> Calendar
+    </button>
+    <button onclick="showSection('alarm')">
+        <i>⏰</i> Alarm
+    </button>
+</div>
+
+<script>
+    function positionClockNumbers() {
+      const clock = document.getElementById('analog-clock');
+      const radius = clock.offsetWidth / 2;
+      const numberRadius = radius - 20;
+  
+      for (let i = 1; i <= 12; i++) {
+          const angle = (i * 30) * (Math.PI / 180);
+          const x = radius + numberRadius * Math.sin(angle);
+          const y = radius - numberRadius * Math.cos(angle);
+  
+          const numberDiv = document.createElement('div');
+          numberDiv.className = 'clock-number';
+          numberDiv.style.left = `${x}px`;
+          numberDiv.style.top = `${y}px`;
+          numberDiv.textContent = i;
+          clock.appendChild(numberDiv);
+      }
+  }
+  
+  function updateClock() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const milliseconds = now.getMilliseconds();
+  
+      const hourHand = document.getElementById('hour-hand');
+      const minuteHand = document.getElementById('minute-hand');
+      const secondHand = document.getElementById('second-hand');
+  
+      const hourDeg = ((hours % 12) + minutes / 60) * 30; // 
+      const minuteDeg = (minutes + seconds / 60) * 6; 
+      const secondDeg = (seconds + milliseconds / 1000) * 6; 
+  
+      hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+      minuteHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+      secondHand.style.transform = `translateX(-50%) rotate(${secondDeg}deg)`;
+  
+      const digitalTime = document.getElementById('digital-time');
+      digitalTime.textContent = now.toLocaleTimeString();
+  
+      const currentDate = document.getElementById('current-date');
+      currentDate.textContent = now.toLocaleDateString();
+      const currentDay = document.getElementById('current-day');
+      currentDay.textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+  }
+
+
+  
+  /*-----------------------------------------------------*/
+  let timerInterval;
+      let countdownTime = 0;
+  
+      document.getElementById('start-timer').addEventListener('click', () => {
+          const hours = parseInt(document.getElementById('timer-hours').value) || 0; 
+          const minutes = parseInt(document.getElementById('timer-minutes').value) || 0;
+          const seconds = parseInt(document.getElementById('timer-seconds').value) || 0;
+          countdownTime = (hours * 3600 + minutes * 60 + seconds) * 1000; 
+          
+          if (countdownTime === 0) {
+        alert("Please enter the time.");
+        return;
+    }
+          
+          clearInterval(timerInterval);
+          timerInterval = setInterval(() => {
+              if (countdownTime > 0) {
+                  countdownTime -= 10;
+                  const time = new Date(countdownTime);
+                  const displayTime = new Date(countdownTime).toISOString().substr(11, 8);
+                  document.getElementById('timer-display').innerText = displayTime + '.' + String((countdownTime % 1000) / 10).padStart(2, '0');
+              } else {
+                  clearInterval(timerInterval);
+                  alert("Timer Finished!");
+              }
+          }, 10);
+      });
+  
+      document.getElementById('stop-timer').addEventListener('click', () => {
+          clearInterval(timerInterval);
+          document.getElementById('timer-display').innerText = "00:00:00.000";
+      });
+  
+      /*-----------------------------------------------------*/
+      let stopwatchInterval;
+  let stopwatchTime = 0;
+  let stopwatchRunning = false;
+  
+  document.getElementById('start-stopwatch').addEventListener('click', () => {
+      if (!stopwatchRunning) {
+          stopwatchRunning = true;
+          stopwatchInterval = setInterval(updateStopwatchDisplay, 10);
+          document.getElementById('start-stopwatch').innerText = 'Pause';
+      } else {
+          clearInterval(stopwatchInterval);
+          stopwatchRunning = false;
+          document.getElementById('start-stopwatch').innerText = 'Resume';
+      }
+  });
+  
+  document.getElementById('reset-stopwatch').addEventListener('click', () => {
+      clearInterval(stopwatchInterval);
+      stopwatchTime = 0;
+      document.getElementById('stopwatch-display').innerText = "00:00:00.000";
+      stopwatchRunning = false;
+      document.getElementById('start-stopwatch').innerText = 'Start'; 
+  });
+  
+  function updateStopwatchDisplay() {
+      stopwatchTime += 10;
+      const displayTime = new Date(stopwatchTime).toISOString().substr(11, 8);
+      document.getElementById('stopwatch-display').innerText = displayTime + '.' + String((stopwatchTime % 1000) / 10).padStart(2, '0');
+  }
+  /*-----------------------------------------------------*/
+  
+  function toggleDropdown() {
+      const dropdown = document.getElementById('dropdown-menu');
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+  
+  function showSection(sectionId) {
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(section => section.classList.remove('active'));
+      document.getElementById(`${sectionId}-section`).classList.add('active');
+  }
+  
+  function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      const themeToggle = document.getElementById('toggle-theme');
+      themeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '☀️';
+  }
+  
+  positionClockNumbers();
+  setInterval(updateClock, 1000);
+  
+  document.getElementById('toggle-theme').addEventListener('click', toggleTheme);
+  /*-----------------------------------------------------*/
+
+           let currentMonth = new Date().getMonth();
+          let currentYear = new Date().getFullYear();
+  
+          function loadCalendar() {
+              const calendarDiv = document.getElementById('calendar-dates');
+              const monthYearDisplay = document.getElementById('calendar-month-year');
+              const today = new Date();
+  
+              monthYearDisplay.innerText = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`;
+  
+              calendarDiv.innerHTML = '';
+  
+              const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+              const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  
+              for (let i = 0; i < firstDay; i++) {
+                  const emptyDiv = document.createElement('div');
+                  calendarDiv.appendChild(emptyDiv);
+              }
+  
+              for (let day = 1; day <= daysInMonth; day++) {
+                  const dateDiv = document.createElement('div');
+                  dateDiv.classList.add('calendar-date');
+                  dateDiv.innerText = day;
+
+                  if (
+                      day === today.getDate() &&
+                      currentMonth === today.getMonth() &&
+                      currentYear === today.getFullYear()
+                  ) {
+                      dateDiv.classList.add('highlighted');
+                  }
+  
+                  calendarDiv.appendChild(dateDiv);
+              }
+          }
+  
+          function prevMonth() {
+              currentMonth--;
+              if (currentMonth < 0) {
+                  currentMonth = 11;
+                  currentYear--;
+              }
+              loadCalendar();
+          }
+  
+          function nextMonth() {
+              currentMonth++;
+              if (currentMonth > 11) {
+                  currentMonth = 0;
+                  currentYear++;
+              }
+              loadCalendar();
+          }
+  
+          window.onload = function() {
+              loadCalendar();
+          };
+  
+  /*-----------------------------------------------------*/
+  let alarms = [];
+
+document.getElementById('setAlarmBtn').addEventListener('click', () => {
+    const alarmDate = document.getElementById('alarmDate').value;
+    const alarmTime = document.getElementById('alarmTime').value;
+    const errorMessage = document.getElementById('errorMessage');
+    const alarmMessage = document.getElementById('alarmMessage');
+
+    
+    errorMessage.style.display = 'none';
+    alarmMessage.style.display = 'none';
+
+    if (alarmDate && alarmTime) {
+        const alarmDateTime = new Date(`${alarmDate}T${alarmTime}`);
+        const currentDateTime = new Date();
+
+        if (alarmDateTime > currentDateTime) {
+            alarms.push({ dateTime: alarmDateTime });
+            displayAlarms();
+            alarmMessage.style.display = 'block'; 
+            setTimeout(() => {
+                alarmMessage.style.display = 'none';
+            }, 2000); 
+            startAlarmCheck();
+        } else {
+            errorMessage.style.display = 'block'; 
+        }
+    } else {
+        alert('Please select both date and time!');
+    }
+});
+
+function displayAlarms() {
+    const alarmsList = document.getElementById('alarmsList');
+    alarmsList.innerHTML = '';
+    alarms.forEach((alarm, index) => {
+        const alarmItem = document.createElement('div');
+        alarmItem.className = 'alarm-item';
+        alarmItem.innerHTML = `
+            <span>${alarm.dateTime.toLocaleString()}</span>
+            <button onclick="deleteAlarm(${index})" class="button">Delete</button>
+        `;
+        alarmsList.appendChild(alarmItem);
+    });
+}
+
+function deleteAlarm(index) {
+    alarms.splice(index, 1);
+    displayAlarms();
+}
+
+function startAlarmCheck() {
+    setInterval(() => {
+        const currentDateTime = new Date();
+        alarms.forEach((alarm, index) => {
+            if (currentDateTime >= alarm.dateTime) {
+                triggerAlarm(index);
+            }
+        });
+    }, 1000);
+}
+
+function triggerAlarm(index) {
+    document.getElementById('alarmSound').play();
+    document.getElementById('modal').style.display = 'block';
+    deleteAlarm(index);
+}
+
+document.getElementById('stopAlarmBtn').addEventListener('click', () => {
+    document.getElementById('modal').style.display = 'none';
+    const alarmSound = document.getElementById('alarmSound');
+    alarmSound.pause();
+    alarmSound.currentTime = 0;
+});
+  </script>
+</body>
+</html>
